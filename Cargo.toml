@@ -3,7 +3,7 @@ name = "feld-cli"
 version = "0.0.1"
 edition = "2021"
 description = "cli for the arcane"
-license = "GNU General Public License v3.0"
+license = "MIT"
 authors = ["felden"]
 repository = "https://github.com/feldenserra/feld-cli"
 
