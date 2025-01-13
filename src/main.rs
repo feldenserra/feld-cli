@@ -1,25 +1,52 @@
 #![allow(non_snake_case)]
 use std::env;
+use std::time::{ SystemTime, UNIX_EPOCH };
 
 fn main() {
 
     // get input
-    
-    let args: Vec<String> = env::args().collect();
+    let userInput: Vec<String> = env::args().collect();
 
-    match args.get(1) {
-        Some(command) => {
-            match command.as_str() {
+    match userInput.get(1) 
+    {
+        Some(argument) => {
+
+            match argument.as_str() 
+            {
                 "hello" => println!("hello ! how are you ?"),
-                "-h" | "--help" => print_Help(),
+                "-h" | "--help" => printHelp(),
+                "goodbye" => println!("See ya later . Take care !"),
+                "quote" => printQuote(),
+
+                // Default
                 _ => println!("no commands : try -h for help ."),
             }
+
         }
+
         None => println!("Welcome . try -h for help . "),
     }
 }
 
-fn print_Help()
+fn printQuote()
+{
+    let quotes = [ 
+        "Think well, in all you do .",
+        "Continuos Improvement ."
+    ];
+
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_millis() % 1000;
+
+    let index = (now % quotes.len() as u128) as usize;
+    let result = quotes[index];
+
+    println!("{}", result);
+}
+
+fn printHelp()
 {
     println!("Hello ! How to use feld :");
     println!("\n");
