@@ -10,21 +10,25 @@ fn main() {
     match userInput.get(1) 
     {
         Some(argument) => {
-
-            match argument.as_str() 
-            {
-                "hello" => println!("hello ! how are you ?"),
-                "-h" | "--help" => printHelp(),
-                "goodbye" => println!("See ya later . Take care !"),
-                "quote" => printQuote(),
-
-                // Default
-                _ => println!("no commands : try -h for help ."),
-            }
-
+            let input = argument.as_str();
+            processInput(input);
         }
 
         None => println!("Welcome . try -h for help . "),
+    }
+}
+
+fn processInput(input: &str)
+{
+    match input
+    {
+        "hello" => println!("hello ! how are you ?"),
+        "-h" | "--help" => printHelp(),
+        "goodbye" => println!("See ya later . Take care !"),
+        "quote" => printQuote(),
+
+        // Default
+        _ => println!("no commands : try -h for help ."),
     }
 }
 
