@@ -8,3 +8,7 @@ authors = ["felden"]
 repository = "https://github.com/feldenserra/feld-cli"
 
 [dependencies]
+
+[[bin]]
+name = "feld"
+path = "src/main.rs"
