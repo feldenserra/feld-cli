@@ -1,6 +1,10 @@
 [package]
 name = "feld-cli"
-version = "0.1.0"
-edition = "2021"
+version = "0.0.1"
+edition = "2024"
+description = "cli for the arcane"
+license = "GNU General Public License v3.0"
+author = "felden"
+repository = "https://github.com/feldenserra/feld-cli"
 
 [dependencies]
