@@ -36,7 +36,8 @@ fn printQuote()
 {
     let quotes = [ 
         "Think well, in all you do .",
-        "Continuos Improvement ."
+        "Continuos improvement .",
+        "Maintain your identity . "
     ];
 
     let now = SystemTime::now()
@@ -54,8 +55,8 @@ fn printHelp()
 {
     println!("Hello ! How to use feld :");
     println!("\n");
-    println!("  hello       Print a greeting !");
     println!("  -h          Show this message");
+    println!("  hello       Print a greeting !");
     println!("  goodbye     Print a farewell");
     println!("  quote       Print a random quote");
 }
