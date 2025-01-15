@@ -32,6 +32,16 @@ fn processInput(input: &str)
     }
 }
 
+fn getRandomIndex(arrLen: usize) -> usize
+{
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap()
+        .as_millis() % 1000;
+
+    return (now % arrLen as u128) as usize;
+}
+
 fn printQuote()
 {
     let quotes = [ 
@@ -40,15 +50,9 @@ fn printQuote()
         "Maintain your identity . "
     ];
 
-    let now = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_millis() % 1000;
+    let result = getRandomIndex(quotes.len());
 
-    let index = (now % quotes.len() as u128) as usize;
-    let result = quotes[index];
-
-    println!("{}", result);
+    println!("{}", quotes[result]);
 }
 
 fn printHelp()
