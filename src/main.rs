@@ -28,7 +28,7 @@ fn main() {
 
 fn processInputVec(input: Vec<String>, inputLen: usize)
 {
-    if inputLen < 2
+    if inputLen < 3
     {
         processSingleInput(input.get(1).unwrap().as_str());
     }
