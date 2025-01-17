@@ -2,23 +2,42 @@
 use std::env;
 use std::time::{ SystemTime, UNIX_EPOCH };
 
+/*struct CliArgs
+{
+    tool: str,
+    mainArg: str,
+    secArg: Vec<str>
+}
+*/
+
 fn main() {
 
     // get input
     let userInput: Vec<String> = env::args().collect();
+    let inputLen = userInput.len();
 
-    match userInput.get(1) 
+    if inputLen > 1
     {
-        Some(argument) => {
-            let input = argument.as_str();
-            processInput(input);
-        }
-
-        None => println!("Welcome . try -h for help . "),
+        processInputVec(userInput, inputLen);
+    }
+    else
+    {
+        println!("Welcome . try -h for help . ");
     }
 }
 
-fn processInput(input: &str)
+fn processInputVec(input: Vec<String>, inputLen: usize)
+{
+    if inputLen < 2
+    {
+        processSingleInput(input.get(1).unwrap().as_str());
+    }
+    else
+    {
+    }
+}
+
+fn processSingleInput(input: &str)
 {
     match input
     {
