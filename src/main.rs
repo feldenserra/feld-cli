@@ -30,11 +30,12 @@ fn processInputVec(input: Vec<String>, inputLen: usize)
 {
     if inputLen < 3
     {
-        processSingleInput(input.get(1).unwrap().as_str());
+        processSingleInput(input[1].as_str());
     }
     else
     {
-    }
+        println!("multiple CLI args: {:?}", input)
+    } 
 }
 
 fn processSingleInput(input: &str)
@@ -47,7 +48,7 @@ fn processSingleInput(input: &str)
         "quote" => printQuote(),
 
         // Default
-        _ => println!("no commands : try -h for help ."),
+        _ => println!("no commands found : try -h for help ."),
     }
 }
 
