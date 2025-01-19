@@ -4,35 +4,10 @@
 
 #![allow(non_snake_case)]
 use std::env;
-use crate::simpleCmd::*;
-use crate::strct::*;
+use crate::commands::*;
 //use crate::utils::*;
-mod simpleCmd;
+mod commands;
 mod utils;
-mod strct;
-
-const SIMPLE_COMMANDS: [SimpleCommand; 5] = [
-    SimpleCommand {
-        name: "help",
-        action: printHelp,
-    },
-    SimpleCommand {
-        name: "version",
-        action: printVersion,
-    },
-    SimpleCommand {
-        name: "hello",
-        action: printHello,
-    },
-    SimpleCommand {
-        name: "goodbye",
-        action: printBye,
-    },
-    SimpleCommand {
-        name: "quote",
-        action: printQuote,
-    },
-];
 
 fn main() {
     let userInput: Vec<String> = env::args().collect();
@@ -56,15 +31,23 @@ fn processInputVec(input: Vec<String>, inputLen: usize) {
         Ok(false) => {},
     }
 
-    if let Err(msg) = checkComplexInput(&input) {
-        println!("OoOps: {}", msg);
-        return;
+    match checkComplexInput(&input, inputLen) {
+        Ok(()) => return,
+        Err(msg) => {
+            println!("OoOps: {}", msg);
+            println!("gh/feldenserra/feld-cli");
+            return;
+        },
     }
 }
 
-fn checkComplexInput(input: &[String]) -> Result<(), String> {
-    println!("multiple CLI args: {:?}", input);
-    return Ok(());
+fn checkComplexInput(input: &[String], inputLen: usize) -> Result<(), String> {
+    if let Some(command) = COMPLEX_COMMANDS.iter().find(|&cmd| cmd.name.contains(&input[1].as_str())) {
+        (command.action)(command.params, input, inputLen);
+        return Ok(());
+    }
+
+    return Err(format!("'{}' does not exist , should it ?", input[1].as_str()));
 }
 
 fn checkSingleInput(input: &[String], inputLen: usize) -> Result<bool, String> {
