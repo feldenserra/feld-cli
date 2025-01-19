@@ -2,7 +2,6 @@
 // feld-cli
 // -------------------------------------------------------- //
 use crate::utils::*;
-use colored::*;
 
 pub struct SimpleCommand {
     pub name: &'static str,
@@ -57,28 +56,59 @@ pub const COMPLEX_COMMANDS: [ComplexCommand; 2] = [
     },
 ];
 
+pub fn ProcessParams(params: &[(&str,&[&str])], input: &[String]) -> Result<(String,Option<String>), String> {
+    match input.get(3) {
+        Some(userOption)  => {
+            if let Some(tuple) = params.iter().find(|t| t.0 == userOption) {
+                match input.get(4) {
+                    Some(subOpt)  => {
+                        if let Some(subParam) = tuple.1.iter().find(|t| *t == subOpt) {
+                            println!("option found: {}", userOption);
+                            println!("subOption found: {}", subParam);
+                            Ok((userOption.to_string(),Some(subParam.to_string())))
+                        } else {
+                            Ok((userOption.to_string(),None))
+                        }
+                        
+                    },
+                    None => {
+                        println!("option found: {}", userOption);
+                        Err(format!("Incorrect subOpt for {}", userOption))
+                    },
+                }
+            } else {
+                Err(format!("Incorrect option"))
+            }
+        }, 
+        None => {
+            Err(format!("None found matching"))
+        },
+    }
+}
+
 pub fn handleSay(params: &[(&str,&[&str])], input: &[String], inputLen: usize) {
     if inputLen < 3 {
         println!("feld needs something to say .");
         println!("~~ try feld say -h");
         return;
     }
-    
+
     if input[2] == "-h"{
         println!("~~ say -h");
-        println!("\n");
         println!("  feld say '[1]' [2] -[3], textToSay, option, optMods");
         println!("  loud (-er;)     extra emphasis");
         println!("  quiet (-er;)    less emphasis");
         println!("  myst (-ic;)     ~~");
-        println!("~~ Examples");
         println!("\n");
+        println!("~~ Examples");
         println!("feld say 'i love flowers'");
         println!("feld say 'for loop?' loud -er");
         return;
     }
 
-    println!("feld says {:?}", input);
+    _ = ProcessParams(params, input);
+
+    //println!("feld says {}", input[3]);
 }
 
 pub fn handleSlk(params: &[(&str,&[&str])], input: &[String], inputLen: usize) {
@@ -87,16 +117,15 @@ pub fn handleSlk(params: &[(&str,&[&str])], input: &[String], inputLen: usize) {
         println!("~~ try feld slk -h");
         return;
     }
-    
+
     if input[2] == "-h"{
         println!("~~ slk -h");
-        println!("\n");
         println!("  feld slk [1] [2] -[3], whatToDo, option, optMods");
         println!("  check (-org;)    checks all");
         println!("  do (-org;)       does all");
         println!("  myst (-ic;)      ~~");
-        println!("~~ Examples");
         println!("\n");
+        println!("~~ Examples");
         println!("feld slk check");
         println!("feld slk do -org");
         return;
