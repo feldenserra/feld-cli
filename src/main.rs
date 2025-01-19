@@ -1,88 +1,84 @@
+// Main  
+// feld-cli
+// -------------------------------------------------------- //
+
 #![allow(non_snake_case)]
 use std::env;
-use std::time::{ SystemTime, UNIX_EPOCH };
+use crate::simpleCmd::*;
+use crate::strct::*;
+//use crate::utils::*;
+mod simpleCmd;
+mod utils;
+mod strct;
 
-/*struct CliArgs
-{
-    tool: str,
-    mainArg: str,
-    secArg: Vec<str>
-}
-*/
+const SIMPLE_COMMANDS: [SimpleCommand; 5] = [
+    SimpleCommand {
+        name: "help",
+        action: printHelp,
+    },
+    SimpleCommand {
+        name: "version",
+        action: printVersion,
+    },
+    SimpleCommand {
+        name: "hello",
+        action: printHello,
+    },
+    SimpleCommand {
+        name: "goodbye",
+        action: printBye,
+    },
+    SimpleCommand {
+        name: "quote",
+        action: printQuote,
+    },
+];
 
 fn main() {
-
-    // get input
     let userInput: Vec<String> = env::args().collect();
     let inputLen = userInput.len();
 
-    if inputLen > 1
-    {
-        processInputVec(userInput, inputLen);
-    }
-    else
-    {
+    if inputLen < 2 {
         println!("Welcome . try -h for help . ");
+        return;
+    }
+
+    processInputVec(userInput, inputLen);
+}
+
+fn processInputVec(input: Vec<String>, inputLen: usize) {
+    match checkSingleInput(&input, inputLen) {
+        Ok(true) => return,
+        Err(msg) => { 
+            println!("OoOps: {}", msg); 
+            return;
+        },
+        Ok(false) => {},
+    }
+
+    if let Err(msg) = checkComplexInput(&input) {
+        println!("OoOps: {}", msg);
+        return;
     }
 }
 
-fn processInputVec(input: Vec<String>, inputLen: usize)
-{
-    if inputLen < 3
-    {
-        processSingleInput(input[1].as_str());
+fn checkComplexInput(input: &[String]) -> Result<(), String> {
+    println!("multiple CLI args: {:?}", input);
+    return Ok(());
+}
+
+fn checkSingleInput(input: &[String], inputLen: usize) -> Result<bool, String> {
+    let firstArg = input[1].as_str();
+
+    if let Some(command) = SIMPLE_COMMANDS.iter().find(|cmd| cmd.name == firstArg) {
+        if inputLen > 2 {
+            return Err(format!("'{}' does not need arugments .", firstArg));
+        }
+
+        (command.action)();
+        return Ok(true);
     }
-    else
-    {
-        println!("multiple CLI args: {:?}", input)
-    } 
+
+    Ok(false)
 }
-
-fn processSingleInput(input: &str)
-{
-    match input
-    {
-        "hello" => println!("hello ! how are you ?"),
-        "-h" | "--help" => printHelp(),
-        "goodbye" => println!("See ya later . Take care !"),
-        "quote" => printQuote(),
-
-        // Default
-        _ => println!("no commands found : try -h for help ."),
-    }
-}
-
-fn getRandomIndex(arrLen: usize) -> usize
-{
-    let now = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_millis() % 1000;
-
-    return (now % arrLen as u128) as usize;
-}
-
-fn printQuote()
-{
-    let quotes = [ 
-        "Think well, in all you do .",
-        "Continuos improvement .",
-        "Maintain your identity . "
-    ];
-
-    let result = getRandomIndex(quotes.len());
-
-    println!("{}", quotes[result]);
-}
-
-fn printHelp()
-{
-    println!("Hello ! How to use feld :");
-    println!("\n");
-    println!("  -h          Show this message");
-    println!("  hello       Print a greeting !");
-    println!("  goodbye     Print a farewell");
-    println!("  quote       Print a random quote");
-}
-
 
