@@ -56,34 +56,24 @@ pub const COMPLEX_COMMANDS: [ComplexCommand; 2] = [
     },
 ];
 
-pub fn ProcessParams(params: &[(&str,&[&str])], input: &[String]) -> Result<(String,Option<String>), String> {
-    match input.get(3) {
-        Some(userOption)  => {
-            if let Some(tuple) = params.iter().find(|t| t.0 == userOption) {
-                match input.get(4) {
-                    Some(subOpt)  => {
-                        if let Some(subParam) = tuple.1.iter().find(|t| *t == subOpt) {
-                            println!("option found: {}", userOption);
-                            println!("subOption found: {}", subParam);
-                            Ok((userOption.to_string(),Some(subParam.to_string())))
-                        } else {
-                            Ok((userOption.to_string(),None))
-                        }
-                        
-                    },
-                    None => {
-                        println!("option found: {}", userOption);
-                        Err(format!("Incorrect subOpt for {}", userOption))
-                    },
-                }
-            } else {
-                Err(format!("Incorrect option"))
-            }
-        }, 
-        None => {
-            Err(format!("None found matching"))
-        },
-    }
+pub fn ProcessParams(params: &[(&str,&[&str])], input: &[String]) -> Result<(Option<String>,Option<String>), (Option<String>,Option<String>)> {
+    let Some(userOption) = input.get(3) else {
+        return Ok((None, None))
+    };
+
+    let Some(tuple) = params.iter().find(|t| t.0 == userOption) else {
+        return Err((Some(format!("{}", userOption)), None))
+    };
+
+    let Some(subOpt) = input.get(4) else {
+        return Ok((Some(format!("{}", userOption)), None))
+    };
+
+    let Some(_) = tuple.1.iter().find(|t| *t == subOpt) else {
+        return Err((Some(format!("{}", userOption)), Some(format!("{}", subOpt))))
+    };
+
+    return Ok((Some(format!("{}", userOption)), Some(format!("{}", subOpt))))
 }
 
 pub fn handleSay(params: &[(&str,&[&str])], input: &[String], inputLen: usize) {
@@ -106,9 +96,20 @@ pub fn handleSay(params: &[(&str,&[&str])], input: &[String], inputLen: usize) {
         return;
     }
 
-    _ = ProcessParams(params, input);
+    match ProcessParams(params, input) {
+        Ok((None,None)) => {
+            formatSayText()
+        },
+        _ => {
 
-    //println!("feld says {}", input[3]);
+        },
+    }
+
+    println!("feld says {}", input[2]);
+}
+
+pub fn formatSayText() {
+    println!("Format Text Here");
 }
 
 pub fn handleSlk(params: &[(&str,&[&str])], input: &[String], inputLen: usize) {
