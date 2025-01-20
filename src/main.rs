@@ -4,7 +4,7 @@
 
 #![allow(non_snake_case)]
 use std::env;
-use crate::commands::*;
+use crate::commands:: { COMPLEX_COMMANDS, SIMPLE_COMMANDS };
 //use crate::utils::*;
 mod commands;
 mod utils;

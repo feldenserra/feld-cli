@@ -9,6 +9,12 @@ pub struct SimpleCommand {
     pub action: fn() -> (),
 }
 
+pub struct ComplexCommand {
+    pub name: &'static[&'static str],
+    pub action: fn(&'static[(&'static str, &'static[&'static str])], &[String], usize) -> (),
+    pub params: &'static[(&'static str, &'static[&'static str])],
+}
+
 pub const SIMPLE_COMMANDS: [SimpleCommand; 5] = [
     SimpleCommand {
         name: "-h",
@@ -32,12 +38,6 @@ pub const SIMPLE_COMMANDS: [SimpleCommand; 5] = [
     },
 ];
 
-pub struct ComplexCommand {
-    pub name: &'static[&'static str],
-    pub action: fn(&'static[(&'static str, &'static[&'static str])], &[String], usize) -> (),
-    pub params: &'static[(&'static str, &'static[&'static str])],
-}
-
 pub const COMPLEX_COMMANDS: [ComplexCommand; 2] = [
     ComplexCommand {
         name: &["say", "echo"],
@@ -52,13 +52,16 @@ pub const COMPLEX_COMMANDS: [ComplexCommand; 2] = [
         name: &["slk", "git"],
         action: handleSlk,
         params: &[
-            ("myst", &["ic"]),
+            ("check", &["-now"]),
+            ("do", &["-now"]),
+            ("myst", &["-ic"]),
         ],
     },
 ];
 
-pub fn ProcessParams(params: &[(&str,&[&str])], input: &[String]) -> Result<(Option<String>,Option<String>), (Option<String>,Option<String>)> {
-    let Some(userOption) = input.get(3) else {
+//~~ Notso
+fn ProcessParams(params: &[(&str,&[&str])], input: &[String], usrIndex: usize) -> Result<(Option<String>,Option<String>), (Option<String>,Option<String>)> {
+    let Some(userOption) = input.get(usrIndex) else {
         return Ok((None, None))
     };
 
@@ -66,7 +69,7 @@ pub fn ProcessParams(params: &[(&str,&[&str])], input: &[String]) -> Result<(Opt
         return Err((Some(format!("{}", userOption)), None))
     };
 
-    let Some(subOpt) = input.get(4) else {
+    let Some(subOpt) = input.get(usrIndex+1) else {
         return Ok((Some(format!("{}", userOption)), None))
     };
 
@@ -77,12 +80,13 @@ pub fn ProcessParams(params: &[(&str,&[&str])], input: &[String]) -> Result<(Opt
     return Ok((Some(format!("{}", userOption)), Some(format!("{}", subOpt))))
 }
 
-pub fn handleSay(params: &[(&str,&[&str])], input: &[String], inputLen: usize) {
+fn handleSay(params: &[(&str,&[&str])], input: &[String], inputLen: usize) {
     if inputLen < 3 {
         println!("feld needs something to say .");
         println!("~~ try feld say -h");
         return;
     }
+
     let userInput = &input[2];
 
     if userInput == "-h"{
@@ -98,7 +102,7 @@ pub fn handleSay(params: &[(&str,&[&str])], input: &[String], inputLen: usize) {
         return;
     }
 
-    match ProcessParams(params, input) {
+    match ProcessParams(params, input, 3) {
         Ok((None,None)) => {
             println!("feld says {}", input[2]);
         },
@@ -121,7 +125,7 @@ pub fn handleSay(params: &[(&str,&[&str])], input: &[String], inputLen: usize) {
 
 }
 
-pub fn formatSayText(option: &str, subOpt: Option<&str>, input:  &str) {
+fn formatSayText(option: &str, subOpt: Option<&str>, input:  &str) {
     let mut output = input.normal();
 
     match option {
@@ -158,15 +162,7 @@ pub fn formatSayText(option: &str, subOpt: Option<&str>, input:  &str) {
     println!("feld says {}", output);
 }
 
-//     name: &["say", "echo"],
-//      action: handleSay,
-//        params: &[
-//          ("loud", &["-er"] ), 
-//        ("quiet", &["-er"]),
-//      ("myst", &["-ic"]),
-//],
-
-pub fn handleSlk(params: &[(&str,&[&str])], input: &[String], inputLen: usize) {
+fn handleSlk(params: &[(&str,&[&str])], input: &[String], inputLen: usize) {
     if inputLen < 3 {
         println!("feld needs something to store .");
         println!("~~ try feld slk -h");
@@ -176,50 +172,69 @@ pub fn handleSlk(params: &[(&str,&[&str])], input: &[String], inputLen: usize) {
     if input[2] == "-h"{
         println!("~~ slk -h");
         println!("  feld slk [1] [2] -[3], whatToDo, option, optMods");
-        println!("  check (-org;)    checks all");
-        println!("  do (-org;)       does all");
+        println!("  check (-now;)    checks all");
+        println!("  do (-now;)       does all");
         println!("  myst (-ic;)      ~~");
         println!("\n");
         println!("~~ Examples");
         println!("feld slk check");
-        println!("feld slk do -org");
+        println!("feld slk do -now");
         return;
     }
 
-    println!("handleSlk in progress: {:?}", input);
+    match ProcessParams(params, input, 2) {
+        Ok((None,None)) => {
+            println!("slk_wip: standard, no params");
+        },
+        Ok((Some(option), None)) => {
+            println!("slk_wip: opt-{}", option);
+        },
+        Ok((Some(option), Some(subOpt))) => {
+            println!("slk_wip: opt-{},subOpt-{}", option, subOpt);
+        },
+        Err((Some(option), None)) => {
+            println!("slk_wip: Error||| opt-{}", option);
+        },
+        Err((Some(option), Some(subOpt))) => {
+            println!("slk_wip: Error||| opt-{}, subOpt-{}", option, subOpt);
+        },
+        _ => {
+            println!("slk_wip:'say' got lost .");
+        },
+    }
 }
 
-pub fn printHelp() {
-    println!("Hello ! How to use feld :");
-
-    println!("\n");
+//~~ Simple
+fn printHelp() {
+    println!("~~ Hello ! How to use feld :");
+    println!("");
     println!("~~ Simple ~~");
     println!("  version     Print feld version");
     println!("  -h          Show this message");
     println!("  hello       Print a greeting !");
     println!("  goodbye     Print a farewell");
     println!("  quote       Print a random quote");
-
-    println!("\n");
-    println!("~~ Not So ~~");
+    println!("");
+    println!("~~ Notso ~~");
+    println!("use '-h' with any Notso command for help");
     println!("  say         says");
     println!("  slk         Store your Learned Knowledge");
 }
 
-pub fn printVersion(){
+fn printVersion(){
     println!("~~ feld-cli {} ~~", env!("CARGO_PKG_VERSION"));
     println!("{}", env!("CARGO_PKG_DESCRIPTION"));
 }
 
-pub fn printHello(){
+fn printHello(){
     println!("Hello ! How are you ?")
 }
 
-pub fn printBye() {
+fn printBye() {
     println!("See ya later . Take care !")
 }
 
-pub fn printQuote() {
+fn printQuote() {
     let quotes = [ 
         "Think well, in all you do .",
         "Continuos improvement .",
