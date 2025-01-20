@@ -2,6 +2,7 @@
 // feld-cli
 // -------------------------------------------------------- //
 use crate::utils::*;
+use colored::*;
 
 pub struct SimpleCommand {
     pub name: &'static str,
@@ -82,8 +83,9 @@ pub fn handleSay(params: &[(&str,&[&str])], input: &[String], inputLen: usize) {
         println!("~~ try feld say -h");
         return;
     }
+    let userInput = &input[2];
 
-    if input[2] == "-h"{
+    if userInput == "-h"{
         println!("~~ say -h");
         println!("  feld say '[1]' [2] -[3], textToSay, option, optMods");
         println!("  loud (-er;)     extra emphasis");
@@ -98,19 +100,71 @@ pub fn handleSay(params: &[(&str,&[&str])], input: &[String], inputLen: usize) {
 
     match ProcessParams(params, input) {
         Ok((None,None)) => {
-            formatSayText()
+            println!("feld says {}", input[2]);
+        },
+        Ok((Some(option), None)) => {
+            formatSayText(&option, None, userInput);
+        },
+        Ok((Some(option), Some(subOpt))) => {
+            formatSayText(&option, Some(&subOpt), userInput);
+        },
+        Err((Some(option), None)) => {
+            println!("'say' doesnt know what '{}' is .", option);
+        },
+        Err((Some(option), Some(subOpt))) => {
+            println!("'say {}' doesnt know what '{}' is .", option, subOpt);
         },
         _ => {
-
+            println!("'say' got lost .");
         },
     }
 
-    println!("feld says {}", input[2]);
 }
 
-pub fn formatSayText() {
-    println!("Format Text Here");
+pub fn formatSayText(option: &str, subOpt: Option<&str>, input:  &str) {
+    let mut output = input.normal();
+
+    match option {
+        "loud" => {
+            output = output.yellow();
+        },
+        "quiet" => {
+            output = output.italic();
+        },
+        "myst" => {
+            output = output.blue();
+        },
+        _ => {
+            println!("'say' got lost ."); return; 
+        },
+    }
+
+    let Some(subOption) = subOpt else {
+        println!("feld says {}", output); return; 
+    };
+
+    match subOption {
+        "-er" => {
+            output = output.underline();
+        },
+        "-ic" => {
+            output = output.blink();
+        },
+        _ => {
+            println!("'say' got lost ."); return; 
+        },
+    }
+
+    println!("feld says {}", output);
 }
+
+//     name: &["say", "echo"],
+//      action: handleSay,
+//        params: &[
+//          ("loud", &["-er"] ), 
+//        ("quiet", &["-er"]),
+//      ("myst", &["-ic"]),
+//],
 
 pub fn handleSlk(params: &[(&str,&[&str])], input: &[String], inputLen: usize) {
     if inputLen < 3 {
